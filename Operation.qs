@@ -6,7 +6,7 @@ namespace Quantum {
     operation QuantumRandomNumberGenerator() : Int {
         mutable randomNumber = 0;
         
-        // Accumulate 64 random bits, each taken one-by-one from a single qbit
+        // Accumulate 64 random bits, right-to-left, each taken one-by-one from a single qbit
         for (i in 1 .. 64) {
         
             using(q = Qubit())  {   // Allocate a qubit.
