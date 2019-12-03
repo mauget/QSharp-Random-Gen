@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="Operation.qs" />
+      <Content Include="Operations.qs" />
     </ItemGroup>
 
 </Project>

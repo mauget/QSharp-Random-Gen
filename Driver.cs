@@ -10,9 +10,12 @@ namespace QSharp_Random_Gen
 
         static void Main(string[] args)
         {
-            Console.WriteLine(String.Format("{0} q#-generated 64-bit random integers:", ResultCount));
-
+            // Ping simulator
             using var quantumSimulator = new QuantumSimulator();
+            PingQ.Run(quantumSimulator).Wait();
+            
+            // Gen random numbers
+            Console.WriteLine($"{ResultCount} q#-generated 64-bit random integers:");
             for (var d = 0; d < ResultCount; d++)
             {
                 // Call q# processing here

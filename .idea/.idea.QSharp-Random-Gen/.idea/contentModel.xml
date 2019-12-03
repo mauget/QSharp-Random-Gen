@@ -17,13 +17,12 @@
         </e>
         <e p="qsharp" t="Include">
           <e p="src" t="Include">
-            <e p="Operation.g.cs" t="Include" />
             <e p="Operations.g.cs" t="Include" />
             <e p="QSharp-Random-Gen.bson" t="Include" />
           </e>
         </e>
       </e>
-      <e p="Operation.qs" t="Include" />
+      <e p="Operations.qs" t="Include" />
       <e p="packages" t="ExcludeRecursive" />
       <e p="QSharp-Random-Gen.csproj" t="IncludeRecursive" />
       <e p="QSharp-Random-Gen.sln" t="IncludeFlat" />
