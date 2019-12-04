@@ -18,13 +18,13 @@ namespace Quantum {
                 if (res == One) {
                     set randomNumber = Or(randomNumber, 1);
                 }
-                Reset(q);  // We must always reset qbits
+                Reset(q);  // We must always reset released qbits
             }
         }
         return randomNumber;
     }
     
     operation PingQ() : Unit {
-        Message("Hello from quantum world!");
+        Message("Hello from Quantum World!");
     }
 }
