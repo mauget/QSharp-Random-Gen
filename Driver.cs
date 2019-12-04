@@ -6,12 +6,17 @@ namespace QSharp_Random_Gen
 {
     class Driver
     {
-        static int ResultCount = 10;
+        private static int ResultCount = 10;
+        private static Boolean ThrowsOnReleasingQuitsNotInZerosState = true;
+        private static Boolean DisableBorrowing = true;
 
         static void Main(string[] args)
         {
             // Ping simulator
-            using var quantumSimulator = new QuantumSimulator();
+            using var quantumSimulator = new QuantumSimulator(
+                ThrowsOnReleasingQuitsNotInZerosState, 
+                (uint)Guid.NewGuid().GetHashCode(), 
+                DisableBorrowing);
             PingQ.Run(quantumSimulator).Wait();
             
             // Gen random numbers
