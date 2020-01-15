@@ -1,7 +1,13 @@
 ﻿using System;
 using Microsoft.Quantum.Simulation.Simulators;
 using Quantum;
+// ReSharper disable InvalidXmlDocComment
 
+/// -------------------------------------------------------------------------------------------------
+///  A C# driver that invokes Q# :operations":
+///  1. Calls a Q# quantum ping operation
+///  2. Invokes a Q# operation that generates 10 random numbers to the console
+/// --------------------------------------------------------------------------------------------------
 namespace QSharp_Random_Gen
 {
     class Driver
@@ -20,7 +26,7 @@ namespace QSharp_Random_Gen
             PingQ.Run(quantumSimulator).Wait();
             
             // Gen random numbers
-            Console.WriteLine($"{ResultCount} q# generated 64-bit random integers:");
+            Console.WriteLine($"{ResultCount} Q#-generated 64-bit random integers:");
             for (var d = 0; d < ResultCount; d++)
             {
                 // Call q# processing here
