@@ -1,6 +1,8 @@
 # QSharp-Random-Gen
 ## Q# Quantum Random Number Generator
 
+(TODO into words here)
+
 ### What
 A quantum random number generator (QRNG) that consists of three parts:
 1. Quantum computer hardware (or simulator software) used like a coprocessor
@@ -21,16 +23,20 @@ founded on elemental particles. A statiscal vote amount physical qubits derives 
 a logical qbit.Expect to see supercooling to near-zero degrees Kelvin as well. You won't
 soon own a quantum smart watch soon.
 
-### Today's Applications
+### Quantum Computing Today
 Where are the practical applications? The kicker is the word, "sufficient". Currently,
 qbits are profoundly expensive and error-prone due to "noise" in them. That is one reason
 for the near-zero Kelvin temperatures invovled. A quantum application may run 
 many "shots" at a solution, plucking a statical winner from error noise. 
 
-Where are the real quantum computers? Big organizations are making breakthroughs. 
-Cloud-based qunatum computer access for small tasks is a current or near-future on-ramp 
-to limited quantum computing acess. We have run a QRNG on  IBM Q, for example.
-Check out this non-exhaustive list: 
+A quamtum application concept often involves specialized algorithms that would not realistically 
+complete on a classical computer. Applications such as factoring large numbers, can involve 
+cooperation between a classical program and a classicxal program.
+
+Where are real quantum computers? Big organizations are making breakthroughs. 
+Cloud-based quantum computer access for small tasks is a current or near-future on-ramp 
+to limited quantum computing access. We have run a QRNG queued to _IBM Q Experience_, for example.
+Check out this non-exhaustive list of enterprises working in this field:
 
 - [IBM Q Experience](https://www.ibm.com/quantum-computing/technology/experience/?p1=Search&p4=p50386405608&p5=b&cm_mmc=Search_Google-_-1S_1S-_-WW_NA-_-%2Bquantum%20%2Bcomputers_b&cm_mmca7=71700000061253577&cm_mmca8=kwd-320795842941&cm_mmca9=Cj0KCQiAjfvwBRCkARIsAIqSWlMB60-YX89C4X58atBOqJLgkrwww9OWy07F2WAr_SONnKMPqWCDCk0aAoc-EALw_wcB&cm_mmca10=406149579079&cm_mmca11=b&gclid=Cj0KCQiAjfvwBRCkARIsAIqSWlMB60-YX89C4X58atBOqJLgkrwww9OWy07F2WAr_SONnKMPqWCDCk0aAoc-EALw_wcB&gclsrc=aw.ds) 
 - [Microsoft (Azure Quantum)](https://www.wired.com/story/microsoft-taking-quantum-computers-cloud/)
@@ -38,7 +44,7 @@ Check out this non-exhaustive list:
 - [D-Wave Systems](https://www.dwavesys.com/quantum-computing)
 - [Google Quantum Computing](https://research.google/teams/applied-science/quantum/)
 
-### Characteristics
+### Quantum Characteristics
 We mentioned non-intutive characteristics that defy our macro-world senses. Quantum
 characteristics manifest in the pico-world. For a longer, more authoratative discussion refer to 
 [https://en.wikipedia.org/wiki/Qubit](https://en.wikipedia.org/wiki/Qubit). Note that if you
@@ -69,6 +75,11 @@ superposition, yielding its state.
 Our Q# code causes a single qbit to generate a random bit. It repeats, accumulating
 many results into a set of random numbers returned as a result to a C# controller.
 
+#### Decoherence
+Decoherence can mean: "qbit falls out of superposition." Qbits don't stay
+in superpostion forever. They decohere ... quickly. Another hurdle in trying
+to solve problems via quantum computing.
+
 ### Q# Language
 Programming a raw quantum computer could involve rearranging or plugging in physical hardware 
 components. That was how users "programmed" the first analog computers to solve problems.
@@ -85,11 +96,105 @@ an actual (expensive) quantum computer, our QRNG would exploit it.
 
 ### Quantum Simulator
 If we can simulate a quantum computer on a classical computer what is the point of a
-quantum computer? It's that pesky entanglement characteristic composed with the floating
+quantum computer? It's that pesky entanglement characteristic mixed with the floating
 states of superposition. Complexity increases exponentially with the numer of qbits.
 Our QRNG uses just one qbit, so the simualtor is up to the job.
 
+## QRNG Demo
+Let's discuss the QRNG bottom-up. Output first, followed by relevant code, and then 
+wrap up with how to install and run. Our QRNG demo is a .NET Core application consisting of a
+C# controller invoking a Q# quantum task.
 
+### Output
+A `dotnet run` issued from the root of our QRNG project produced the following
+console output:
+````
+Hello from Quantum World!
+10 Q#-generated 64-bit random integers:
+    03D2167DDA774C0E
+    ACB41924DD444D2F
+    DE7A33C27DE54698
+    7E5F619A4BBF04A7
+    1080C9C2EEEC88A4
+    FAA9505AB73900FD
+    57C4786AAC2E56EF
+    A48190371B476BD5
+    A425B8E0492E6FEC
+    90A797C20D8AC9FE
+
+Process finished with exit code 0
+</code>
+````
+It differs with each invocation. This execution runs the core Q# fragment 10 x 64 = 640 
+times to accumulate that output. 
+
+### Heart of The Demo
+Q# is a statically typed blend of C# and F#. Types follow declaration, but can be omitted for
+when static flow type-derivation occurs. The Q# operation follows. It should be readable by 
+most JavaScript, C#, Go, or Java programmers. This operation's code is taken from
+[Microsoft's Quickstart QRN](https://docs.microsoft.com/en-us/quantum/quickstarts/qrng?view=qsharp-preview)
+We suggest reading that page for more details (e.g. read about the "Bloch Sphere") .
+
+```
+    operation QuantumRandomNumberGenerator() : Int {
+        mutable randomNumber = 0;
+        
+        // Accumulate 64 random bits, right-to-left, each taken per-step from a single qubit
+        for (i in 1 .. 64) {
+        
+            using(q = Qubit())  {   // Allocate single qubit.
+                H(q);               // Hadamard gate moves qubit into superposition. 
+                let res = M(q);     // Measure the qubit value: a 50% chance of seeing 0 or 1.
+                
+                // Accumulate to sliding bit sequence
+                set randomNumber = LeftShiftedI(randomNumber, 1);
+                if (res == One) {
+                    set randomNumber = Or(randomNumber, 1);
+                }
+                Reset(q);  // We must always reset released qbits
+            }
+        }
+        return randomNumber;
+    }   
+```
+
+The core logic is basic:
+1. Obtain a single qubit.
+1. Send it to a _Hadamard quantum gate_ that consumes the qbit, returning it in superposition state. 
+1. Measure the qbit, collapsing the superposition to a random concrete state.
+
+The quantum action centers on this extracted fragment:
+```
+    H(q);               // Hadamard gate moves qubit into superposition. 
+    let res = M(q);     // Measure the qubit value: a 50% chance of seeing 0 or 1.          
+```
+
+Q# can carry out classical operations as well. 
+We made ours accumulate a random 64-bit integer from repeatedly measuring the qbit
+in superposition. Our invoking C# driver collects ten results, logging each to 
+the console:
+
+```
+// Gen random numbers
+Console.WriteLine($"{ResultCount} Q#-generated 64-bit random integers:");
+for (var d = 0; d < ResultCount; d++)
+{
+    // Call q# processing here
+    var res = QuantumRandomNumberGenerator.Run(quantumSimulator).Result;
+    Console.WriteLine("{0,20:X16}", res);
+}
+```
+### Build and Run
+
+The build tree is at 
+
+**Dependencies**:
++ A Linux, MacOS, or Windows system capable of running .NET Core.
++ .NET Core 3 (ours is 3.0.101)
++ 
+
+## Summary
+(TODO summarize here)
 
 ## Refs
 
@@ -98,4 +203,7 @@ Our QRNG uses just one qbit, so the simualtor is up to the job.
 + Dilbert: [https://dilbert.com/strip/2012-04-17](https://dilbert.com/strip/2012-04-17)
 + Quantum Information Theory: [https://en.wikipedia.org/wiki/Quantum_information_theory](https://en.wikipedia.org/wiki/Quantum_information_theory)
 + 2017 Entanglement Distance Record: [https://www.sciencealert.com/physicists-just-quantum-entangled-photons-between-earth-and-space](https://www.sciencealert.com/physicists-just-quantum-entangled-photons-between-earth-and-space)
-
++ Decoherence: [https://en.wikipedia.org/wiki/Quantum_decoherence](https://en.wikipedia.org/wiki/Quantum_decoherence)
++ The Q# Programming Language: [https://docs.microsoft.com/en-us/quantum/language/?view=qsharp-preview](https://docs.microsoft.com/en-us/quantum/language/?view=qsharp-preview)
++ Microsoft Quantum Documentation: [https://docs.microsoft.com/en-us/quantum/?view=qsharp-preview](https://docs.microsoft.com/en-us/quantum/?view=qsharp-preview)
++ MS QRNG Example: [https://docs.microsoft.com/en-us/quantum/quickstarts/qrng?view=qsharp-preview](https://docs.microsoft.com/en-us/quantum/quickstarts/qrng?view=qsharp-preview)
