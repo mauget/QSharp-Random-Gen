@@ -187,6 +187,7 @@ for (var d = 0; d < ResultCount; d++)
 ### Build and Run
 
 The build tree is at 
+[https://github.com/mauget/QSharp-Random-Gen](https://github.com/mauget/QSharp-Random-Gen).
 
 **Dependencies**:
 + A Linux, MacOS, or Windows system capable of running .NET Core.
