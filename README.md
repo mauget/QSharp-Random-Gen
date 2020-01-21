@@ -1,8 +1,6 @@
 # QSharp-Random-Gen
 ## Q# Quantum Random Number Generator
 
-(TODO into words here)
-
 ### What
 A quantum random number generator (QRNG) that consists of three parts:
 1. Quantum computer hardware (or simulator software) used like a coprocessor
@@ -193,9 +191,6 @@ The build tree is at
 + A Linux, MacOS, or Windows system capable of running .NET Core.
 + .NET Core 3 (ours is 3.0.101)
 + 
-
-## Summary
-(TODO summarize here)
 
 ## Refs
 
